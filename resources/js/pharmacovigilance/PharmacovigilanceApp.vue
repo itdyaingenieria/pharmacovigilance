@@ -22,8 +22,10 @@ const isAuthenticated = ref(Boolean(tokenStore.get()));
 const loading = ref(false);
 const errorMessage = ref('');
 const successMessage = ref('');
+const successToast = ref('');
 const warningToast = ref('');
 const activeLot = ref('951357');
+let successToastTimer = null;
 let warningToastTimer = null;
 
 const medications = ref([]);
@@ -53,6 +55,19 @@ function showWarningToast(message) {
         warningToast.value = '';
         warningToastTimer = null;
     }, 4500);
+}
+
+function showSuccessToast(message) {
+    successToast.value = message;
+
+    if (successToastTimer) {
+        clearTimeout(successToastTimer);
+    }
+
+    successToastTimer = setTimeout(() => {
+        successToast.value = '';
+        successToastTimer = null;
+    }, 3500);
 }
 
 function parseError(error, fallback = 'An unexpected error occurred.') {
@@ -136,6 +151,10 @@ async function sendBulkAlerts() {
         const summary = response.data.summary;
         successMessage.value = `Bulk alert completed. Sent: ${summary.sent}, Duplicates: ${summary.skipped_duplicate}, Failed: ${summary.failed}.`;
 
+        if (summary.sent > 0) {
+            showSuccessToast(`Bulk send successful: ${summary.sent} alert(s) sent.`);
+        }
+
         if (summary.skipped_duplicate > 0) {
             showWarningToast(`Skipped duplicates: ${summary.skipped_duplicate} order(s) already had an alert for this lot.`);
         }
@@ -213,6 +232,7 @@ async function confirmAlert() {
             lot_number: activeLot.value,
         });
         successMessage.value = `Alert sent for order #${pendingAlertOrder.value.id}.`;
+        showSuccessToast(`Alert sent successfully for order #${pendingAlertOrder.value.id}.`);
     } catch (error) {
         if (error?.response?.status === 409) {
             showWarningToast(parseError(error, 'Alert skipped: an alert was already sent for this order and lot.'));
@@ -284,6 +304,7 @@ function logout() {
         <AlertModal :visible="showAlertModal" :order="pendingAlertOrder" :lot="activeLot" @close="closeAlertModal"
             @confirm="confirmAlert" />
 
+        <div class="pv-toast pv-toast-success" v-if="successToast">{{ successToast }}</div>
         <div class="pv-toast pv-toast-warning" v-if="warningToast">{{ warningToast }}</div>
 
         <div class="pv-loading" v-if="loading">Processing...</div>

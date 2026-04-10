@@ -292,6 +292,12 @@ button {
     background: #fff7e6;
 }
 
+.pv-toast-success {
+    color: #0f766e;
+    border-color: #99f6e4;
+    background: #f0fdfa;
+}
+
 @keyframes pv-toast-in {
     from {
         opacity: 0;
