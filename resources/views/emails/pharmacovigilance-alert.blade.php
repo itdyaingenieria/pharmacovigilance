@@ -16,7 +16,7 @@
         A medication safety alert has been identified for one of the medications in your order.
     </p>
 
-    <p><strong>Details:</strong></p>
+    <p><strong>Medication details:</strong></p>
     <ul>
         <li><strong>Order:</strong> #{{ $payload['order']->id }}</li>
         <li><strong>Medication:</strong> {{ $payload['medication']?->name ?? 'Medication linked to this lot' }}</li>
