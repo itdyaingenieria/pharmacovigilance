@@ -184,3 +184,13 @@ For local testing, configure mailer in `.env`.
 - Role-based access: Implemented (admin-only)
 - Unit/Feature tests: Implemented
 - Docker setup: Implemented
+
+## 📝 Licencia
+
+Este proyecto está bajo la licencia MIT.
+
+## 📧 Contacto
+
+Para preguntas o soporte, contacta a diegoyamaa@gmail.com.
+
+🎉 ¡Prueba Laravel 2026-abril!
