@@ -22,7 +22,9 @@ const isAuthenticated = ref(Boolean(tokenStore.get()));
 const loading = ref(false);
 const errorMessage = ref('');
 const successMessage = ref('');
+const warningToast = ref('');
 const activeLot = ref('951357');
+let warningToastTimer = null;
 
 const medications = ref([]);
 const orders = ref([]);
@@ -38,6 +40,19 @@ const hasData = computed(() => orders.value.length > 0);
 function clearMessages() {
     errorMessage.value = '';
     successMessage.value = '';
+}
+
+function showWarningToast(message) {
+    warningToast.value = message;
+
+    if (warningToastTimer) {
+        clearTimeout(warningToastTimer);
+    }
+
+    warningToastTimer = setTimeout(() => {
+        warningToast.value = '';
+        warningToastTimer = null;
+    }, 4500);
 }
 
 function parseError(error, fallback = 'An unexpected error occurred.') {
@@ -120,6 +135,10 @@ async function sendBulkAlerts() {
 
         const summary = response.data.summary;
         successMessage.value = `Bulk alert completed. Sent: ${summary.sent}, Duplicates: ${summary.skipped_duplicate}, Failed: ${summary.failed}.`;
+
+        if (summary.skipped_duplicate > 0) {
+            showWarningToast(`Skipped duplicates: ${summary.skipped_duplicate} order(s) already had an alert for this lot.`);
+        }
     } catch (error) {
         errorMessage.value = parseError(error, 'Unable to send bulk alerts.');
     } finally {
@@ -195,7 +214,11 @@ async function confirmAlert() {
         });
         successMessage.value = `Alert sent for order #${pendingAlertOrder.value.id}.`;
     } catch (error) {
-        errorMessage.value = parseError(error, 'Unable to send the alert.');
+        if (error?.response?.status === 409) {
+            showWarningToast(parseError(error, 'Alert skipped: an alert was already sent for this order and lot.'));
+        } else {
+            errorMessage.value = parseError(error, 'Unable to send the alert.');
+        }
     } finally {
         loading.value = false;
         closeAlertModal();
@@ -260,6 +283,8 @@ function logout() {
 
         <AlertModal :visible="showAlertModal" :order="pendingAlertOrder" :lot="activeLot" @close="closeAlertModal"
             @confirm="confirmAlert" />
+
+        <div class="pv-toast pv-toast-warning" v-if="warningToast">{{ warningToast }}</div>
 
         <div class="pv-loading" v-if="loading">Processing...</div>
     </main>

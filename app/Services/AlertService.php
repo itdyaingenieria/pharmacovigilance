@@ -68,6 +68,14 @@ class AlertService
         try {
             Mail::to($order->customer->email)->send(new PharmacovigilanceAlertMail($payload));
 
+            Log::channel('stderr')->info('Alert email sent successfully.', [
+                'order_id' => $order->id,
+                'customer_id' => $order->customer_id,
+                'customer_email' => $order->customer->email,
+                'lot_number' => $lot,
+                'triggered_by_user_id' => $triggeredBy->id,
+            ]);
+
             Log::info('Alert email sent successfully.', [
                 'order_id' => $order->id,
                 'customer_id' => $order->customer_id,
@@ -90,6 +98,15 @@ class AlertService
                 ],
             ]);
         } catch (\Throwable $exception) {
+            Log::channel('stderr')->error('Failed to send alert email.', [
+                'order_id' => $order->id,
+                'customer_id' => $order->customer_id,
+                'customer_email' => $order->customer?->email,
+                'lot_number' => $lot,
+                'triggered_by_user_id' => $triggeredBy->id,
+                'error' => $exception->getMessage(),
+            ]);
+
             Log::error('Failed to send alert email.', [
                 'order_id' => $order->id,
                 'customer_id' => $order->customer_id,
