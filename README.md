@@ -185,6 +185,11 @@ For local testing, configure mailer in `.env`.
 - Unit/Feature tests: Implemented
 - Docker setup: Implemented
 
+## View Forms
+
+![Login](pv1.png)
+![Search](pv2.png)
+
 ## 📝 Licencia
 
 Este proyecto está bajo la licencia MIT.
