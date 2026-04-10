@@ -1,0 +1,51 @@
+version: "3.9"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pharmacovigilance_app
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mysql
+    environment:
+      APP_ENV: local
+      APP_DEBUG: "true"
+      APP_URL: http://localhost:8000
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: pharmacovigilance
+      DB_USERNAME: pharmacovigilance
+      DB_PASSWORD: pharmacovigilance
+
+  vite:
+    image: node:20
+    container_name: pharmacovigilance_vite
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    ports:
+      - "5173:5173"
+    command: bash -lc "npm install && npm run dev -- --host 0.0.0.0"
+
+  mysql:
+    image: mysql:8.0
+    container_name: pharmacovigilance_mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: pharmacovigilance
+      MYSQL_USER: pharmacovigilance
+      MYSQL_PASSWORD: pharmacovigilance
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:
