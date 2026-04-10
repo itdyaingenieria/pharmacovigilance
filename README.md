@@ -189,6 +189,7 @@ For local testing, configure mailer in `.env`.
 
 ![Login](pv1.png)
 ![Search](pv2.png)
+![Alert](pv3.png)
 
 ## 📝 Licencia
 
