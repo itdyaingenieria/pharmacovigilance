@@ -6,6 +6,7 @@ use App\Mail\PharmacovigilanceAlertMail;
 use App\Models\Alert;
 use App\Models\Order;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class AlertService
@@ -67,6 +68,14 @@ class AlertService
         try {
             Mail::to($order->customer->email)->send(new PharmacovigilanceAlertMail($payload));
 
+            Log::info('Alert email sent successfully.', [
+                'order_id' => $order->id,
+                'customer_id' => $order->customer_id,
+                'customer_email' => $order->customer->email,
+                'lot_number' => $lot,
+                'triggered_by_user_id' => $triggeredBy->id,
+            ]);
+
             return Alert::create([
                 'customer_id' => $order->customer_id,
                 'order_id' => $order->id,
@@ -81,6 +90,15 @@ class AlertService
                 ],
             ]);
         } catch (\Throwable $exception) {
+            Log::error('Failed to send alert email.', [
+                'order_id' => $order->id,
+                'customer_id' => $order->customer_id,
+                'customer_email' => $order->customer?->email,
+                'lot_number' => $lot,
+                'triggered_by_user_id' => $triggeredBy->id,
+                'error' => $exception->getMessage(),
+            ]);
+
             return Alert::create([
                 'customer_id' => $order->customer_id,
                 'order_id' => $order->id,

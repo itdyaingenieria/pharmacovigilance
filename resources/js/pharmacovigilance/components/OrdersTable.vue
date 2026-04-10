@@ -65,9 +65,9 @@ function isSelected(orderId) {
                         <td>{{ order.purchase_date }}</td>
                         <td class="pv-actions">
                             <button class="pv-link" @click="$emit('view-order', order)">View order</button>
-                            <button class="pv-link" @click="$emit('alert', order)">Alert customer</button>
+                            <button class="pv-link" @click="$emit('alert', order)">Alert Buyer</button>
                             <button class="pv-link" @click="$emit('view-customer', order.customer)">View
-                                customer</button>
+                                Buyer</button>
                         </td>
                     </tr>
                     <tr v-if="rows.length === 0">
